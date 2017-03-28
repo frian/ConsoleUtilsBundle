@@ -18,7 +18,9 @@ class RecreateDoctrineDatabaseCommand extends Command
             // the name of the command (the part after "bin/console")
             ->setName('utils:doctrine:recreate')
 
-            ->addOption('force', null, InputOption::VALUE_NONE, 'Needed for compatibility with doctrine:database:drop')
+            ->addOption('force', '-f', InputOption::VALUE_NONE, 'Needed for compatibility with doctrine:database:drop')
+
+            ->addOption('fixtures', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The directory to load data fixtures from.')
 
             ->addOption('no-drop', null, InputOption::VALUE_NONE, 'Needed when the database does not exist')
 
@@ -47,7 +49,6 @@ EOF
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $output->writeln(['', 'Recreating database', '']);
 
         /**
@@ -55,7 +56,7 @@ EOF
          */
         $command = $this->getApplication()->find('doctrine:database:drop');
 
-
+        // pass --force to doctrine:database:drop
         if ($input->getOption('force')) {
 
             // set --force
@@ -68,14 +69,16 @@ EOF
             $arguments = array();
         }
 
+        // ignore symfony error with --no-drop
         $commandOutput = $output;
         if ($input->getOption('no-drop')) {
             $commandOutput = new NullOutput();
         }
 
-
+        // exec
         $returnCode = $this->executeCommand('doctrine:database:drop', $arguments, $commandOutput);
 
+        // handle error
         $this->dropErrorHandler($returnCode, $input, $output);
 
 
@@ -95,8 +98,36 @@ EOF
         $this->errorHandler($returnCode, $output);
 
 
-        $output->writeln(['', 'done', '']);
+        /**
+         * Load fixtures
+         */
+         if ($input->getOption('fixtures')) {
 
+             // set --force
+             $arguments = array(
+                 'command' => 'doctrine:fixtures:load',
+                 '--fixtures'  => $input->getOption('fixtures'),
+             );
+
+
+            //  $output->writeln(['', $input->getOption('fixtures')[0], '']);
+
+            //  exit;
+         }
+         else {
+             $arguments = array();
+         }
+
+
+         // exec
+         $returnCode = $this->executeCommand('doctrine:fixtures:load', $arguments, $output);
+
+         // handle error
+         $this->dropErrorHandler($returnCode, $input, $output);
+
+
+
+        $output->writeln(['', 'done', '']);
     }
 
     private function executeCommand(string $name, array $parameters, OutputInterface $output)
