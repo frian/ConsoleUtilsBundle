@@ -68,8 +68,13 @@ EOF
             $arguments = array();
         }
 
+        $commandOutput = $output;
+        if ($input->getOption('no-drop')) {
+            $commandOutput = new NullOutput();
+        }
 
-        $returnCode = $this->executeCommand('doctrine:database:drop', $arguments, $output);
+
+        $returnCode = $this->executeCommand('doctrine:database:drop', $arguments, $commandOutput);
 
         $this->dropErrorHandler($returnCode, $input, $output);
 
@@ -77,7 +82,7 @@ EOF
         /**
          * Create database
          */
-        $this->executeCommand('doctrine:database:create', [], $output);
+        $returnCode = $this->executeCommand('doctrine:database:create', [], $output);
 
         $this->errorHandler($returnCode, $output);
 
@@ -85,7 +90,7 @@ EOF
         /**
          * Create schema
          */
-        $this->executeCommand('doctrine:schema:create', [], $output);
+        $returnCode = $this->executeCommand('doctrine:schema:create', [], $output);
 
         $this->errorHandler($returnCode, $output);
 
@@ -112,12 +117,20 @@ EOF
     private function dropErrorHandler(int $returnCode, InputInterface $input, OutputInterface $output)
     {
         if ($returnCode) {
-            if ($input->getOption('no-drop')) {
+
+
+            if ($input->getOption('force') && ! $input->getOption('no-drop')) {
+                $output->writeln(['', 'aborted', '']);
+                $output->writeln(['you can add --no-drop', '']);
+                exit;
+            }
+            elseif ($input->getOption('no-drop')) {
                 return;
             }
-            $output->writeln(['', 'aborted', '']);
-            $output->writeln(['you can add --no-drop', '']);
-            die;
+            else {
+                $output->writeln(['', 'aborted', '']);
+                exit;
+            }
         }
     }
 
