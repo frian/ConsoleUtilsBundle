@@ -2,6 +2,7 @@
     "name" : "frian/console-utils-bundle",
     "description" : "some utilities for the Symfony command line",
     "type" : "symfony-bundle",
+    "license": "MIT",
     "authors" : [{
         "name" : "frian",
         "email" : "a@frian.org"
