@@ -1,7 +1,7 @@
 <?php
 
 // src/AppBundle/Command/CreateUserCommand.php
-namespace Frian\UtilsBundle\Command;
+namespace Frian\ConsoleUtilsBundle\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
