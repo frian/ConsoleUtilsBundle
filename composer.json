@@ -7,7 +7,8 @@
         "email" : "a@frian.org"
     }],
     "keywords" : [
-        "symfony"
+        "symfony",
+        "console"
     ],
     "require" : {
             "php": "^5.5.9 || ^7.0",
