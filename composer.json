@@ -11,7 +11,7 @@
     ],
     "require" : {
             "php" : ">=5.5.0",
-            "symfony/framework-bundle" : "^2.7",
+            "symfony/framework-bundle" : "^2.7 || ^3.0",
             "twig/twig" : "*",
             "doctrine/doctrine-bundle" : "*"
     },
