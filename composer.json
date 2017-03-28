@@ -1,0 +1,26 @@
+{
+    "name" : "Frian/ConsoleUtilsBundle",
+    "description" : "some utilities for the Symfony command line",
+    "type" : "symfony-bundle",
+    "authors" : [{
+        "name" : "frian",
+        "email" : "a@frian.org"
+    }],
+    "keywords" : [
+        "symfony"
+    ],
+    "require" : {
+            "php" : ">=5.5.0",
+            "symfony/framework-bundle" : "^2.7",
+            "twig/twig" : "*",
+            "doctrine/doctrine-bundle" : "*"
+    },
+    "autoload" : {
+        "psr-4" : {
+            "Frian\\ConsoleUtilsBundle\\" : ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+]
+    },
+}
