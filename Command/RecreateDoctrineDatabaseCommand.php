@@ -65,7 +65,6 @@ EOF
             $arguments['--force'] = true;
         }
 
-
         // exec
         $returnCode = $this->executeCommand('doctrine:database:drop', $arguments, $output);
 
@@ -93,19 +92,19 @@ EOF
          * Load fixtures
          */
         // set default options
-        $arguments = ['--no-interaction' => true];
+        $arguments = [];
 
         // pass --fixtures to doctrine:fixtures:load
         if ($input->getOption('fixtures')) {
             $arguments['--fixtures'] = $input->getOption('fixtures');
         }
 
-
         // exec
-        $returnCode = $this->executeCommand('doctrine:fixtures:load', $arguments, $output);
+        $returnCode = $this->executeCommand('doctrine:fixtures:load', $arguments, $output, true);
 
         // handle error
         $this->errorHandler($returnCode, $output);
+
 
         $output->writeln(['', 'done', '']);
     }
@@ -115,12 +114,19 @@ EOF
      *
      * @return  int     returnCode
      */
-    private function executeCommand(string $name, array $parameters, OutputInterface $output)
-    {
-        return $this->getApplication()
-            ->find($name)
-            ->run(new ArrayInput($parameters), $output);
-    }
+     private function executeCommand(string $name, array $parameters, OutputInterface $output, bool $noInteraction = null  )
+     {
+         $input = new ArrayInput($parameters);
+
+         // set input to no interaction
+         if ($noInteraction) {
+             $input->setInteractive(false);
+         }
+
+         return $this->getApplication()
+             ->find($name)
+             ->run($input, $output);
+     }
 
     /**
      * Default error handler
