@@ -108,11 +108,6 @@ EOF
                  'command' => 'doctrine:fixtures:load',
                  '--fixtures'  => $input->getOption('fixtures'),
              );
-
-
-            //  $output->writeln(['', $input->getOption('fixtures')[0], '']);
-
-            //  exit;
          }
          else {
              $arguments = array();
