@@ -18,14 +18,13 @@ class RecreateDoctrineDatabaseCommand extends Command
     protected function configure()
     {
         $this
-            // the name of the command (the part after "bin/console")
             ->setName('utils:doctrine:recreate')
 
+            // option --force for doctrine:database:drop
             ->addOption('force', '-f', InputOption::VALUE_NONE, 'Needed for compatibility with doctrine:database:drop')
 
+            // option --fixtures for doctrine:fixtures:load
             ->addOption('fixtures', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The directory to load data fixtures from.')
-
-            ->addOption('no-drop', null, InputOption::VALUE_NONE, 'Needed when the database does not exist')
 
             // the short description shown while running "php bin/console list"
             ->setDescription('Recreate the database and load fixtures')
@@ -42,10 +41,6 @@ For compatibility reasons you have to specifiy the <comment>--force</comment> op
 
   <info>php %command.full_name% --force</info>
 
-If you have no database add the <comment>--no-drop</comment> option
-
-  <info>php %command.full_name% --force --no-drop</info>
-
 You can use the <comment>--fixtures</comment> option from <info>doctrine:fixtures:load</info>
 
 EOF
@@ -59,33 +54,23 @@ EOF
     {
         $output->writeln(['', 'Recreating database', '']);
 
-
         /*
          * Drop database
          */
+        // set default options
+        $arguments = ['--if-exists' => true];
+
         // pass --force to doctrine:database:drop
         if ($input->getOption('force')) {
-
-            $arguments = array(
-                'command' => 'doctrine:database:drop',
-                '--force'  => true,
-            );
-        }
-        else {
-            $arguments = array();
+            $arguments['--force'] = true;
         }
 
-        // ignore symfony error with --no-drop
-        $commandOutput = $output;
-        if ($input->getOption('no-drop')) {
-            $commandOutput = new NullOutput();
-        }
 
         // exec
-        $returnCode = $this->executeCommand('doctrine:database:drop', $arguments, $commandOutput);
+        $returnCode = $this->executeCommand('doctrine:database:drop', $arguments, $output);
 
         // handle error
-        $this->dropErrorHandler($returnCode, $input, $output);
+        $this->errorHandler($returnCode, $output);
 
 
         /*
@@ -107,23 +92,20 @@ EOF
         /*
          * Load fixtures
          */
+        // set default options
+        $arguments = ['--no-interaction' => true];
+
         // pass --fixtures to doctrine:fixtures:load
         if ($input->getOption('fixtures')) {
+            $arguments['--fixtures'] = $input->getOption('fixtures');
+        }
 
-            $arguments = array(
-                'command' => 'doctrine:fixtures:load',
-                '--fixtures'  => $input->getOption('fixtures'),
-             );
-        }
-        else {
-            $arguments = array();
-        }
 
         // exec
         $returnCode = $this->executeCommand('doctrine:fixtures:load', $arguments, $output);
 
         // handle error
-        $this->dropErrorHandler($returnCode, $input, $output);
+        $this->errorHandler($returnCode, $output);
 
         $output->writeln(['', 'done', '']);
     }
@@ -150,32 +132,6 @@ EOF
         if ($returnCode) {
             $output->writeln(['', 'aborted', '']);
             exit;
-        }
-    }
-
-    /**
-     * Database drop error handler
-     *
-     * Exit and show hint if --force
-     * Return if --force and --no-drop
-     * Exit
-     */
-    private function dropErrorHandler(int $returnCode, InputInterface $input, OutputInterface $output)
-    {
-        if ($returnCode) {
-
-            if ($input->getOption('force') && ! $input->getOption('no-drop')) {
-                $output->writeln(['', 'aborted', '']);
-                $output->writeln(['you can add --no-drop', '']);
-                exit;
-            }
-            elseif ($input->getOption('no-drop')) {
-                return;
-            }
-            else {
-                $output->writeln(['', 'aborted', '']);
-                exit;
-            }
         }
     }
 }
