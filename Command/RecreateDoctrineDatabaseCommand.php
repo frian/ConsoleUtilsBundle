@@ -12,6 +12,9 @@ use Symfony\Component\Console\Input\InputOption;
 
 class RecreateDoctrineDatabaseCommand extends Command
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
@@ -31,7 +34,7 @@ class RecreateDoctrineDatabaseCommand extends Command
             // the "--help" option
             ->setHelp(<<<'EOF'
 
-The <info>%command.name%</info> drops and creates the database and load fixtures:
+The <info>%command.name%</info> recreates the database and loads fixtures:
 
   <info>php %command.full_name% </info>
 
@@ -43,23 +46,26 @@ If you have no database add the <comment>--no-drop</comment> option
 
   <info>php %command.full_name% --force --no-drop</info>
 
+You can use the <comment>--fixtures</comment> option from <info>doctrine:fixtures:load</info>
+
 EOF
             );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln(['', 'Recreating database', '']);
 
-        /**
+
+        /*
          * Drop database
          */
-        $command = $this->getApplication()->find('doctrine:database:drop');
-
         // pass --force to doctrine:database:drop
         if ($input->getOption('force')) {
 
-            // set --force
             $arguments = array(
                 'command' => 'doctrine:database:drop',
                 '--force'  => true,
@@ -82,7 +88,7 @@ EOF
         $this->dropErrorHandler($returnCode, $input, $output);
 
 
-        /**
+        /*
          * Create database
          */
         $returnCode = $this->executeCommand('doctrine:database:create', [], $output);
@@ -90,7 +96,7 @@ EOF
         $this->errorHandler($returnCode, $output);
 
 
-        /**
+        /*
          * Create schema
          */
         $returnCode = $this->executeCommand('doctrine:schema:create', [], $output);
@@ -98,33 +104,35 @@ EOF
         $this->errorHandler($returnCode, $output);
 
 
-        /**
+        /*
          * Load fixtures
          */
-         if ($input->getOption('fixtures')) {
+        // pass --fixtures to doctrine:fixtures:load
+        if ($input->getOption('fixtures')) {
 
-             // set --force
-             $arguments = array(
-                 'command' => 'doctrine:fixtures:load',
-                 '--fixtures'  => $input->getOption('fixtures'),
+            $arguments = array(
+                'command' => 'doctrine:fixtures:load',
+                '--fixtures'  => $input->getOption('fixtures'),
              );
-         }
-         else {
-             $arguments = array();
-         }
+        }
+        else {
+            $arguments = array();
+        }
 
+        // exec
+        $returnCode = $this->executeCommand('doctrine:fixtures:load', $arguments, $output);
 
-         // exec
-         $returnCode = $this->executeCommand('doctrine:fixtures:load', $arguments, $output);
-
-         // handle error
-         $this->dropErrorHandler($returnCode, $input, $output);
-
-
+        // handle error
+        $this->dropErrorHandler($returnCode, $input, $output);
 
         $output->writeln(['', 'done', '']);
     }
 
+    /**
+     * Execute a command
+     *
+     * @return  int     returnCode
+     */
     private function executeCommand(string $name, array $parameters, OutputInterface $output)
     {
         return $this->getApplication()
@@ -132,18 +140,29 @@ EOF
             ->run(new ArrayInput($parameters), $output);
     }
 
+    /**
+     * Default error handler
+     *
+     * Exit on error
+     */
     private function errorHandler(int $returnCode, OutputInterface $output)
     {
         if ($returnCode) {
             $output->writeln(['', 'aborted', '']);
-            die;
+            exit;
         }
     }
 
+    /**
+     * Database drop error handler
+     *
+     * Exit and show hint if --force
+     * Return if --force and --no-drop
+     * Exit
+     */
     private function dropErrorHandler(int $returnCode, InputInterface $input, OutputInterface $output)
     {
         if ($returnCode) {
-
 
             if ($input->getOption('force') && ! $input->getOption('no-drop')) {
                 $output->writeln(['', 'aborted', '']);
@@ -159,5 +178,4 @@ EOF
             }
         }
     }
-
 }
