@@ -4,6 +4,8 @@
 namespace Frian\ConsoleUtilsBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -18,6 +20,12 @@ class RunTestsCommand extends ContainerAwareCommand
     {
         $this
             ->setName('utils:tests:run')
+
+            // option --force for doctrine:database:drop
+            ->addOption('force', '-f', InputOption::VALUE_NONE, 'Needed for compatibility with doctrine:database:drop')
+
+            // option --fixtures for doctrine:fixtures:load
+            ->addOption('fixtures', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The directory to load data fixtures from.')
 
             // the short description shown while running "php bin/console list"
             ->setDescription('Runs phpunit tests')
@@ -38,6 +46,72 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
 
-        system('phpunit');
+        // set default options
+        $arguments = [];
+
+        // pass --force to utils:doctrine:recreate
+        if ($input->getOption('force')) {
+            $arguments['--force'] = $input->getOption('force');
+        }
+
+        // pass --fixtures to utils:doctrine:recreate
+        if ($input->getOption('fixtures')) {
+            $arguments['--fixtures'] = $input->getOption('fixtures');
+        }
+
+        $this->getApplication()
+            ->find('utils:doctrine:recreate')
+            ->run(new ArrayInput($arguments), $output);
+
+
+
+        // get root dir (app)
+        $rootDir = $this->getContainer()->get('kernel')->getRootDir();
+
+        // phpunit.xml
+        $phpunitFile = 'phpunit.xml';
+
+
+        // path to phpunit.xml
+        $phpunitPathSf3 = $rootDir.'/../';
+
+        // path without /../
+        $phpunitPathSf3 = preg_replace('/([^\/.]+\/(?1)?\.\.\/)/', '', $phpunitPathSf3);
+
+
+        // path to phpunit.xml for sf2
+        $phpunitPathSf2 = $rootDir.'/';
+
+
+        // phpunit.xml path
+        $phpunitPath = $phpunitPathSf3;
+
+        // phpunit.xml file path
+        $phpunitFilePath = $phpunitPath.$phpunitFile;
+
+
+        // check if file exists
+        if (!file_exists($phpunitFilePath)) {
+
+            // phpunit.xml file path for sf2
+            $phpunitFilePath = $phpunitPathSf2.$phpunitFile;
+
+            $phpunitPath = $phpunitPathSf2;
+
+            if (!file_exists($phpunitFilePath)) {
+                $output->writeln(['', "<error>  $phpunitFile not found in $phpunitPathSf3 and $phpunitPathSf2.</error>", '', 'Aborted', '']);
+                exit;
+            }
+        }
+
+        // create command
+        $command = 'phpunit';
+
+        if (preg_match("/app/", $phpunitPath)) {
+            $command .= ' -c app';
+        }
+
+        // run
+        system($command);
     }
 }
