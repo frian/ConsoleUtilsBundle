@@ -26,7 +26,7 @@ class RecreateDoctrineDatabaseCommand extends Command
             ->addOption('fixtures', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The directory to load data fixtures from.')
 
             // the short description shown while running "php bin/console list"
-            ->setDescription('Recreate the database and load fixtures')
+            ->setDescription('Recreates the database and loads fixtures')
 
             // the full command description shown when running the command with
             // the "--help" option

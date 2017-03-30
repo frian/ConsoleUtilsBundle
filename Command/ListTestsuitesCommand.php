@@ -17,10 +17,10 @@ class ListTestsuitesCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('utils:testsuite:list')
+            ->setName('utils:tests:list')
 
             // the short description shown while running "php bin/console list"
-            ->setDescription('List testsuites')
+            ->setDescription('Lists testsuites')
 
             // the full command description shown when running the command with
             // the "--help" option

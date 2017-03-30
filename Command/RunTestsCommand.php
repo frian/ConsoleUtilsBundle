@@ -17,10 +17,10 @@ class RunTestsCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('utils:test:run')
+            ->setName('utils:tests:run')
 
             // the short description shown while running "php bin/console list"
-            ->setDescription('Run phpunit tests')
+            ->setDescription('Runs phpunit tests')
 
             // the full command description shown when running the command with
             // the "--help" option
