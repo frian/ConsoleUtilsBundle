@@ -48,7 +48,9 @@ For compatibility reasons you have to specifiy the <comment>--force</comment> op
 
   <info>php %command.full_name% --force</info>
 
-You can use the <comment>--fixtures</comment> and <comment>--em</comment> option from <info>doctrine:fixtures:load</info>
+You can use the <comment>--fixtures</comment> option from <info>doctrine:fixtures:load</info>
+You can use the <comment>--em</comment> option from <info>doctrine:fixtures:load</info> and <info>doctrine:schema:create</info>
+You can use the <comment>--connection</comment> option from <info>doctrine:database:create</info> and <info>doctrine:database:drop</info>
 EOF
             );
     }
