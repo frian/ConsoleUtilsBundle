@@ -25,6 +25,9 @@ class RecreateDoctrineDatabaseCommand extends Command
             // option --fixtures for doctrine:fixtures:load
             ->addOption('fixtures', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The directory to load data fixtures from.')
 
+            // option --em for doctrine:fixtures:load
+            ->addOption('em', null, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
+
             // the short description shown while running "php bin/console list"
             ->setDescription('Recreates the database and loads fixtures')
 
@@ -39,7 +42,7 @@ For compatibility reasons you have to specifiy the <comment>--force</comment> op
 
   <info>php %command.full_name% --force</info>
 
-You can use the <comment>--fixtures</comment> option from <info>doctrine:fixtures:load</info>
+You can use the <comment>--fixtures</comment> and <comment>--em</comment> option from <info>doctrine:fixtures:load</info>
 EOF
             );
     }
@@ -94,6 +97,11 @@ EOF
         // pass --fixtures to doctrine:fixtures:load
         if ($input->getOption('fixtures')) {
             $arguments['--fixtures'] = $input->getOption('fixtures');
+        }
+
+        // pass --em to doctrine:fixtures:load
+        if ($input->getOption('em')) {
+            $arguments['--em'] = $input->getOption('em');
         }
 
         // exec
