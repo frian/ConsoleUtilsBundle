@@ -19,7 +19,7 @@ class RunTestsCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('utils:tests:run')
+            ->setName('utils:doctrine:test')
 
             // option --force for doctrine:database:drop
             ->addOption('force', '-f', InputOption::VALUE_NONE, 'Needed for compatibility with doctrine:database:drop')
@@ -28,7 +28,7 @@ class RunTestsCommand extends ContainerAwareCommand
             ->addOption('fixtures', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The directory to load data fixtures from.')
 
             // the short description shown while running "php bin/console list"
-            ->setDescription('Runs phpunit tests')
+            ->setDescription('Runs phpunit tests on a recreated database')
 
             // the full command description shown when running the command with
             // the "--help" option

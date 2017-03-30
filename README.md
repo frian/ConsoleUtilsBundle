@@ -19,8 +19,8 @@ For compatibility reasons you have to specifiy the --force option:
 You can use the --fixtures option from doctrine:fixtures:load
 
 
-### utils:tests:run WIP
+### utils:doctrine:test WIP
 
-The utils:tests:run executes phpunit tests:
+The utils:doctrine:test executes phpunit tests on a recreated database:
 
-    php bin/console utils:tests:run
+    php bin/console utils:doctrine:test
