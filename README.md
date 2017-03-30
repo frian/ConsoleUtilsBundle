@@ -24,3 +24,11 @@ You can use the --fixtures option from doctrine:fixtures:load
 The utils:doctrine:test executes phpunit tests on a recreated database:
 
     php bin/console utils:doctrine:test
+
+For compatibility reasons you have to specifiy the --force option:
+
+    php bin/console utils:doctrine:test --force
+
+You can use the --fixtures option from doctrine:fixtures:load
+
+You can use the --testsuite option from phpunit
