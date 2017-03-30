@@ -19,14 +19,20 @@ class RecreateDoctrineDatabaseCommand extends Command
         $this
             ->setName('utils:doctrine:recreate')
 
+
             // option --force for doctrine:database:drop
             ->addOption('force', '-f', InputOption::VALUE_NONE, 'Needed for compatibility with doctrine:database:drop')
+
+            // option --connection for doctrine:database:create and doctrine:database:drop
+            ->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'The connection to use for this command')
+
 
             // option --fixtures for doctrine:fixtures:load
             ->addOption('fixtures', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The directory to load data fixtures from.')
 
-            // option --em for doctrine:fixtures:load
+            // option --em for doctrine:fixtures:load and doctrine:schema:create
             ->addOption('em', null, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
+
 
             // the short description shown while running "php bin/console list"
             ->setDescription('Recreates the database and loads fixtures')
@@ -62,7 +68,12 @@ EOF
 
         // pass --force to doctrine:database:drop
         if ($input->getOption('force')) {
-            $arguments['--force'] = true;
+            $arguments['--force'] = $input->getOption('force');
+        }
+
+        // pass --connection to doctrine:database:drop
+        if ($input->getOption('connection')) {
+            $arguments['--connection'] = $input->getOption('connection');
         }
 
         // exec
@@ -75,7 +86,15 @@ EOF
         /*
          * Create database
          */
-        $returnCode = $this->executeCommand('doctrine:database:create', [], $output);
+        // set default options
+        $arguments = [];
+
+        // pass --connection to doctrine:database:create
+        if ($input->getOption('connection')) {
+            $arguments['--connection'] = $input->getOption('connection');
+        }
+
+        $returnCode = $this->executeCommand('doctrine:database:create', $arguments, $output);
 
         $this->errorHandler($returnCode, $output);
 
@@ -83,7 +102,15 @@ EOF
         /*
          * Create schema
          */
-        $returnCode = $this->executeCommand('doctrine:schema:create', [], $output);
+         // set default options
+        $arguments = [];
+
+        // pass --em to doctrine:schema:create
+        if ($input->getOption('em')) {
+            $arguments['--em'] = $input->getOption('em');
+        }
+
+        $returnCode = $this->executeCommand('doctrine:schema:create', $arguments, $output);
 
         $this->errorHandler($returnCode, $output);
 
