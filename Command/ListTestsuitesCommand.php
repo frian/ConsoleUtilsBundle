@@ -40,36 +40,44 @@ EOF
         // get root dir (app)
         $rootDir = $this->getContainer()->get('kernel')->getRootDir();
 
-        $file = 'phpunit.xml';
+        // phpunit.xml
+        $phpunitFile = 'phpunit.xml';
 
-        // get path to phpunit.xml
-        $phpunitPath = $rootDir.'/../';
 
-        $phpunitPath = preg_replace('/([^\/.]+\/(?1)?\.\.\/)/', '', $phpunitPath);
+        // path to phpunit.xml
+        $phpunitPathSf3 = $rootDir.'/../';
+
+        // path without /../
+        $phpunitPathSf3 = preg_replace('/([^\/.]+\/(?1)?\.\.\/)/', '', $phpunitPathSf3);
+
 
         // get path to phpunit.xml for sf2
         $phpunitPathSf2 = $rootDir.'/';
 
+
         // phpunit.xml file path
-        $phpunitFile = $phpunitPath.$file;
+        $phpunitFilePath = $phpunitPathSf3.$phpunitFile;
+
 
         // check if file exists
-        if (!file_exists($phpunitFile)) {
+        if (!file_exists($phpunitFilePath)) {
 
             // phpunit.xml file path for sf2
-            $phpunitFile = $phpunitPathSf2.$file;
+            $phpunitFilePath = $phpunitPathSf2.$phpunitFile;
 
-            if (!file_exists($phpunitPathSf2.$file)) {
-                $output->writeln(['', "phpunit.xml not found in $phpunitPath and $phpunitPathSf2.", '', 'Aborted', '']);
+            if (!file_exists($phpunitFilePath)) {
+                $output->writeln(['', "<error>  $phpunitFile .xml not found in $phpunitPathSf3 and $phpunitPathSf2.</error>", '', 'Aborted', '']);
                 exit;
             }
         }
 
-        // loaf file
-        $crawler = new Crawler(file_get_contents($phpunitFile));
+
+        // load file
+        $crawler = new Crawler(file_get_contents($phpunitFilePath));
 
         // get testsuites
         $items = $crawler->filterXPath('//testsuite');
+
 
         // output
         if ($items->count() > 0) {
