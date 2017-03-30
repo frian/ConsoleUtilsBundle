@@ -27,6 +27,9 @@ class RunTestsCommand extends ContainerAwareCommand
             // option --fixtures for doctrine:fixtures:load
             ->addOption('fixtures', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'The directory to load data fixtures from.')
 
+            // option --testsuite for phpunit
+            ->addOption('testsuite', '-t', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Filter which testsuite to run.')
+
             // the short description shown while running "php bin/console list"
             ->setDescription('Runs phpunit tests on a recreated database')
 
@@ -42,6 +45,8 @@ For compatibility reasons you have to specifiy the <comment>--force</comment> op
   <info>php %command.full_name% --force</info>
 
 You can use the <comment>--fixtures</comment> option from <info>doctrine:fixtures:load</info>
+
+You can use the <comment>--testsuite</comment> option from <info>phpunit</info>
 EOF
             );
     }
@@ -65,9 +70,9 @@ EOF
             $arguments['--fixtures'] = $input->getOption('fixtures');
         }
 
-        $this->getApplication()
-            ->find('utils:doctrine:recreate')
-            ->run(new ArrayInput($arguments), $output);
+        // $this->getApplication()
+        //     ->find('utils:doctrine:recreate')
+        //     ->run(new ArrayInput($arguments), $output);
 
 
 
@@ -110,12 +115,20 @@ EOF
             }
         }
 
+
         // create command
         $command = 'phpunit';
 
+        // add -c flag if needed
         if (preg_match("/app/", $phpunitPath)) {
             $command .= ' -c app';
         }
+
+        // add testsuite option
+        if ($input->getOption('testsuite')) {
+            $command .= ' --testsuite ' . $input->getOption('testsuite')[0];
+        }
+
 
         // run
         system($command);
