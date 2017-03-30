@@ -31,7 +31,6 @@ class RecreateDoctrineDatabaseCommand extends Command
             // the full command description shown when running the command with
             // the "--help" option
             ->setHelp(<<<'EOF'
-
 The <info>%command.name%</info> recreates the database and loads fixtures:
 
   <info>php %command.full_name% </info>
@@ -41,7 +40,6 @@ For compatibility reasons you have to specifiy the <comment>--force</comment> op
   <info>php %command.full_name% --force</info>
 
 You can use the <comment>--fixtures</comment> option from <info>doctrine:fixtures:load</info>
-
 EOF
             );
     }
