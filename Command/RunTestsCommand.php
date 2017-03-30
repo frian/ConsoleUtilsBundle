@@ -36,6 +36,12 @@ class RunTestsCommand extends ContainerAwareCommand
 The <info>%command.name%</info> executes phpunit tests:
 
   <info>php %command.full_name% </info>
+
+For compatibility reasons you have to specifiy the <comment>--force</comment> option:
+
+  <info>php %command.full_name% --force</info>
+
+You can use the <comment>--fixtures</comment> option from <info>doctrine:fixtures:load</info>
 EOF
             );
     }
